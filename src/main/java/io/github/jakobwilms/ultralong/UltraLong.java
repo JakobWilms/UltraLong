@@ -8,7 +8,7 @@ import java.util.Arrays;
  * Class for creating and computing UltraLong numbers <br>
  * Used when computing numbers greater than 2<sup>63</sup>-1 or less than -2<sup>63</sup>
  */
-public class UltraLong {
+public class UltraLong implements LongNumber{
 
     /**
      * A constant holding the max number of digits an UltraLong can have
@@ -36,6 +36,15 @@ public class UltraLong {
         initDigits(initValue);
     }
 
+    public UltraLong(UltraLong copy) {
+        this.digits = new UltraLongDigit[copy.digits.length];
+        for (int i = 0; i < copy.digits.length; i++) {
+            this.digits[i] = new UltraLongDigit(copy.digits[i].getDigit());
+        }
+        this.maxDigits = copy.maxDigits;
+        this.positive = copy.positive;
+    }
+
     public UltraLong(int maxDigits, boolean positive) {
         this(0L, maxDigits, positive);
     }
@@ -56,21 +65,63 @@ public class UltraLong {
         this(initValue, 100);
     }
 
+    @Override
     public void add(int i) {
         add((long) i);
     }
 
+    @Override
     public void add(long i) {
-        add(new UltraLong(i, String.valueOf(i).length()));
+        add((LongNumber) new UltraLong(i, String.valueOf(i).length()));
     }
 
-    public void add(@NotNull UltraLong other) {
+    @Override
+    public void add(LongNumber i) {
+        add((UltraLong) i);
+    }
+
+    @Override
+    public void subtract(int i) {
+        subtract((long) i);
+    }
+
+    @Override
+    public void sub(int i) {
+        subtract(i);
+    }
+
+    @Override
+    public void subtract(long i) {
+        subtract((LongNumber) new UltraLong(i, String.valueOf(i).length()));
+    }
+
+    @Override
+    public void sub(long i) {
+        subtract(i);
+    }
+
+    @Override
+    public void subtract(LongNumber i) {
+        subtract((UltraLong) i);
+    }
+
+    @Override
+    public void sub(LongNumber i) {
+        subtract(i);
+    }
+
+    private void add(@NotNull UltraLong other) {
         if (!other.isPositive()) {
+            System.out.println("other negative");
             subtract(other);
             return;
         }
         if (!this.isPositive()) {
-
+            UltraLong l = new UltraLong(other);
+            l.subtract(this);
+            this.maxDigits = l.maxDigits;
+            this.digits = l.digits;
+            this.positive = l.positive;
         }
         int max = Math.max(this.maxDigits, other.maxDigits);
         this.setMaxDigits(max + 1);
@@ -85,14 +136,17 @@ public class UltraLong {
         }
     }
 
-    public void subtract(@NotNull UltraLong other) {
+    private void subtract(@NotNull UltraLong other) {
         int max = Math.max(this.maxDigits, other.maxDigits);
+        System.out.println("max: " + max);
         this.setMaxDigits(max + 1);
         this.grow();
         int cache = 0;
-        int length = this.size();
         for (int i = 0; i < this.size() && i < other.size(); i++) {
-            cache = this.getDigits()[length - i - 1].subtract(other.getDigits()[other.size() - i - 1], cache);
+            cache = this.getDigits()[this.size() - i - 1].subtract(other.getDigits()[other.size() - i - 1], cache);
+            if (i == this.size() - 1 || i == other.size() - 1) {
+                this.getDigits()[0].subtract(cache);
+            }
         }
     }
 
@@ -167,9 +221,9 @@ public class UltraLong {
                     var1.append('_');
                 }
             }
-            return var1.toString();
+            return isPositive() ? var1.toString() : ("-" + var1);
         }
-        return builder.toString();
+        return isPositive() ? builder.toString() : ("-" + builder);
     }
 
     public String toObjectString() {

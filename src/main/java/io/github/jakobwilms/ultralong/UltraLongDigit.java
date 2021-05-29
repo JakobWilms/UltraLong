@@ -2,7 +2,11 @@ package io.github.jakobwilms.ultralong;
 
 public class UltraLongDigit {
 
-    public static final char[] DIGITS = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    public static final char[] DIGITS;
+
+    static {
+        DIGITS = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    }
 
     private char digit;
 
@@ -60,13 +64,11 @@ public class UltraLongDigit {
     public int subtract(UltraLongDigit other, int cache) {
         int value = Integer.parseInt(String.valueOf(getDigit()));
         int otherValue = Integer.parseInt(String.valueOf(other.getDigit()));
-        String subtract = String.valueOf(value - otherValue - cache);
+        String subtract = value >= otherValue ? String.valueOf(value - otherValue - cache) : String.valueOf(10 + value - otherValue -cache);
+        System.out.println("Subtract:{value=" + value + ", otherValue=" + otherValue + ", subtract=" + subtract + ", cache=" + cache + "}");
         if (subtract.length() == 1) {
             this.digit = subtract.charAt(0);
-            return 0;
-        } else if (subtract.length() == 3) {
-            this.digit = subtract.charAt(2);
-            return 1;
+            return value >= otherValue ? 0 : 1;
         } else {
             throw new UltraLongOperationFailedException("Subtracted value to low / high: " + subtract);
         }

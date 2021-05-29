@@ -1,5 +1,8 @@
 package io.github.jakobwilms.ultralong;
 
+/**
+ * Interface used for Numbers like {@link UltraLong}
+ */
 public interface LongNumber {
 
     void add(int i);

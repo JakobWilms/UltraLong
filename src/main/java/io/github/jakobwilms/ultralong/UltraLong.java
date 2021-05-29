@@ -86,7 +86,14 @@ public class UltraLong {
     }
 
     public void subtract(@NotNull UltraLong other) {
-
+        int max = Math.max(this.maxDigits, other.maxDigits);
+        this.setMaxDigits(max + 1);
+        this.grow();
+        int cache = 0;
+        int length = this.size();
+        for (int i = 0; i < this.size() && i < other.size(); i++) {
+            cache = this.getDigits()[length - i - 1].subtract(other.getDigits()[other.size() - i - 1], cache);
+        }
     }
 
     private void grow() {

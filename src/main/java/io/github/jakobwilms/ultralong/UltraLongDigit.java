@@ -57,6 +57,29 @@ public class UltraLongDigit {
         }
     }
 
+    public int subtract(UltraLongDigit other, int cache) {
+        int value = Integer.parseInt(String.valueOf(getDigit()));
+        int otherValue = Integer.parseInt(String.valueOf(other.getDigit()));
+        String subtract = String.valueOf(value - otherValue - cache);
+        if (subtract.length() == 1) {
+            this.digit = subtract.charAt(0);
+            return 0;
+        } else if (subtract.length() == 3) {
+            this.digit = subtract.charAt(2);
+            return 1;
+        } else {
+            throw new UltraLongOperationFailedException("Subtracted value to low / high: " + subtract);
+        }
+    }
+
+    public void subtract(int other) {
+        subtract(new UltraLongDigit(other));
+    }
+
+    public int subtract(UltraLongDigit other) {
+        return subtract(other, 0);
+    }
+
     public char getDigit() {
         return digit;
     }
@@ -71,4 +94,5 @@ public class UltraLongDigit {
                 "digit=" + digit +
                 '}';
     }
+
 }
